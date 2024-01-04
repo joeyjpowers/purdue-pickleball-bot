@@ -1,9 +1,7 @@
 import os
 from io import BytesIO
 
-import requests
-from PIL import Image
-from discord.ext import commands
+import mysql.connector
 import discord
 from dotenv import load_dotenv
 
@@ -15,10 +13,10 @@ VERIFY_CHANNEL_ID = 1192360611825324134
 client = discord.Client(intents=discord.Intents.all())
 
 
-
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
+
 
 @client.event
 async def on_message(message):
@@ -33,15 +31,6 @@ async def on_message(message):
     elif message.content == 'bye':
         await officer_channel.send(f'Goodbye {message.author}')
     else:
-        # if message.attachments and len(message.attachments) == 1:
-        #     # Get the image file
-        #     image_file = message.attachments[0]
-        #
-        #     # Read the image file content as bytes
-        #     image_bytes = await image_file.read()
-        #
-        #     # Send the image to the server channel
-        #     await officer_channel.send(f"{message.content} ({message.author})", file=discord.File(fp=BytesIO(image_bytes), filename=image_file.filename))
         if message.attachments:
             files_to_send = []
             for attachment in message.attachments:
@@ -55,7 +44,19 @@ async def on_message(message):
                 # Send the image to the server channel
             await officer_channel.send(f"{message.content} ({message.author})", files=files_to_send)
         else:
-            await officer_channel.send(message.content)
+            await officer_channel.send(f"{message.content} ({message.author})")
+
+
+@client.event
+async def on_reaction_add(reaction, user):
+    print(reaction.emoji)
+    print(reaction.message.content)
+    print(user)
+    if reaction.emoji == "✅":
+        print("check mark")
+    elif reaction.emoji == "❌":
+        print("x")
+    await reaction.message.channel.send(f'{user} reacted with {reaction.emoji}')
 
 
 client.run(TOKEN)
