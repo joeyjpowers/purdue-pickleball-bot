@@ -33,20 +33,27 @@ async def on_message(message):
     elif message.content == 'bye':
         await officer_channel.send(f'Goodbye {message.author}')
     else:
-        if message.attachments and len(message.attachments) == 1:
-            # Get the image file
-            image_file = message.attachments[0]
-
-            # Read the image file content as bytes
-            image_bytes = await image_file.read()
-
-            # Send the image to the server channel
-            await officer_channel.send(message.content, file=discord.File(fp=BytesIO(image_bytes), filename=image_file.filename))
-        elif message.attachments and len(message.attachments) > 1:
-            await officer_channel.send(message.content)
+        # if message.attachments and len(message.attachments) == 1:
+        #     # Get the image file
+        #     image_file = message.attachments[0]
+        #
+        #     # Read the image file content as bytes
+        #     image_bytes = await image_file.read()
+        #
+        #     # Send the image to the server channel
+        #     await officer_channel.send(f"{message.content} ({message.author})", file=discord.File(fp=BytesIO(image_bytes), filename=image_file.filename))
+        if message.attachments:
+            files_to_send = []
             for attachment in message.attachments:
-                image_bytes = attachment.read()
-                await officer_channel.send(file=discord.File(image_bytes))
+                # Get the image file
+                image_file = attachment
+
+                # Read the image file content as bytes
+                image_bytes = await image_file.read()
+                files_to_send.append(discord.File(fp=BytesIO(image_bytes), filename=image_file.filename))
+
+                # Send the image to the server channel
+            await officer_channel.send(f"{message.content} ({message.author})", files=files_to_send)
         else:
             await officer_channel.send(message.content)
 
